@@ -1,0 +1,268 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🌸 For You</title>
+  <style>
+    /* =======================
+       QUICK PERSONALIZE
+       - Change recipientName and message in the JS section below.
+       - Optional: change --accent / --bg colors here.
+       ======================= */
+    :root {
+      --bg: #0f1020;
+      --card: rgba(255,255,255,0.08);
+      --text: #ffffff;
+      --muted: #c7c9d9;
+      --accent: #ff6ea6; /* main flower color */
+      --accent-2: #ffd166; /* secondary flower color */
+      --green: #6ee7b7; /* stems/leaves */
+      --glow: 0 0 20px rgba(255, 110, 166, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 50% -10%, #1a1b34, var(--bg));
+      overflow-x: hidden;
+    }
+
+    .container {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(720px, 96vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      padding: 28px 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: clamp(24px, 4.5vw, 40px);
+      letter-spacing: 0.3px;
+      margin: 0 0 8px 0;
+      text-shadow: var(--glow);
+    }
+    .subtitle {
+      margin: 0 0 20px 0;
+      color: var(--muted);
+      font-size: clamp(14px, 2.4vw, 18px);
+    }
+
+    .bouquet-wrap {
+      position: relative;
+      width: 100%;
+      height: clamp(300px, 48vw, 460px);
+      display: grid;
+      place-items: end center;
+      margin: 8px 0 8px;
+      overflow: visible;
+      filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35));
+    }
+
+    /* Bloom button */
+    .cta {
+      appearance: none; border: 0; cursor: pointer;
+      background: linear-gradient(90deg, var(--accent), #b86bff);
+      color: white; font-weight: 700; letter-spacing: 0.3px;
+      padding: 14px 18px; border-radius: 999px; font-size: 16px;
+      box-shadow: 0 8px 28px rgba(184,107,255,0.35);
+      transition: transform .15s ease, box-shadow .2s ease;
+    }
+    .cta:hover { transform: translateY(-1px); box-shadow: 0 12px 36px rgba(184,107,255,0.45); }
+    .cta:active { transform: translateY(1px) scale(.98); }
+
+    /* Floating petals */
+    .petal { position: fixed; top: -40px; width: 16px; height: 16px; pointer-events: none; opacity: 0.9; transform: rotate(0deg); }
+    @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.95; } }
+
+    /* Note tag */
+    .note {
+      position: absolute; bottom: 14px; right: 14px;
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 13px; padding: 8px 12px; border-radius: 12px;
+    }
+
+    /* SVG bouquet styling & animations */
+    svg { overflow: visible; }
+    .stem { stroke: var(--green); stroke-width: 6; fill: none; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+    .leaf { fill: #2dd4bf; opacity: 0.0; transform-origin: center; }
+    .flower { transform-origin: center; opacity: 0.0; }
+    .petals-1 { fill: var(--accent); }
+    .petals-2 { fill: var(--accent-2); }
+    .center { fill: #ffe9a8; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+    .wrap { fill: rgba(255,255,255,0.2); stroke: rgba(255,255,255,0.35); stroke-width: 2; }
+
+    @keyframes bloomIn { 0% { transform: scale(0.2) rotate(-12deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+    @keyframes leafPop { 0% { transform: scale(0.1) rotate(-20deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+    @keyframes sway { 0% { transform: rotate(-1deg); } 50% { transform: rotate(1.3deg); } 100% { transform: rotate(-1deg); } }
+
+    .bloom .flower { animation: bloomIn .9s cubic-bezier(.2,.7,.2,1) forwards; }
+    .bloom .leaf { animation: leafPop .6s ease-out .3s forwards; }
+    .bloom .sway { animation: sway 5s ease-in-out .9s infinite; transform-origin: bottom center; }
+
+    /* Footer */
+    .footer {
+      margin-top: 16px;
+      text-align: center; color: var(--muted); font-size: 12px;
+    }
+
+    /* Mobile spacing */
+    @media (max-width: 480px) { .note { font-size: 12px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1 class="title">For <span id="recipient">You</span> 💐</h1>
+      <p class="subtitle" id="headline">A little bouquet from miles away—tap the button to bloom.</p>
+
+      <div class="bouquet-wrap">
+        <!-- SVG Bouquet -->
+        <svg id="bouquet" width="100%" height="100%" viewBox="0 0 600 500" role="img" aria-label="A bouquet of blooming flowers">
+          <!-- Stems -->
+          <g class="sway">
+            <path class="stem" d="M300 480 Q 290 360 250 260" />
+            <path class="stem" d="M300 480 Q 310 350 350 240" />
+            <path class="stem" d="M300 480 Q 300 360 300 240" />
+          </g>
+
+          <!-- Leaves -->
+          <ellipse class="leaf" cx="270" cy="340" rx="16" ry="10" />
+          <ellipse class="leaf" cx="330" cy="340" rx="16" ry="10" />
+          <ellipse class="leaf" cx="285" cy="380" rx="14" ry="9" />
+          <ellipse class="leaf" cx="315" cy="390" rx="14" ry="9" />
+
+          <!-- Flowers -->
+          <g class="flower" style="transform-origin: 250px 240px">
+            <circle class="center" cx="250" cy="240" r="10" />
+            <g class="petals-1">
+              <circle cx="250" cy="220" r="22" />
+              <circle cx="230" cy="240" r="22" />
+              <circle cx="250" cy="260" r="22" />
+              <circle cx="270" cy="240" r="22" />
+            </g>
+          </g>
+
+          <g class="flower" style="transform-origin: 350px 240px">
+            <circle class="center" cx="350" cy="240" r="10" />
+            <g class="petals-2">
+              <circle cx="350" cy="218" r="20" />
+              <circle cx="332" cy="238" r="20" />
+              <circle cx="350" cy="260" r="20" />
+              <circle cx="368" cy="238" r="20" />
+            </g>
+          </g>
+
+          <g class="flower" style="transform-origin: 300px 220px">
+            <circle class="center" cx="300" cy="220" r="12" />
+            <g class="petals-1">
+              <circle cx="300" cy="198" r="24" />
+              <circle cx="278" cy="220" r="24" />
+              <circle cx="300" cy="244" r="24" />
+              <circle cx="322" cy="220" r="24" />
+            </g>
+          </g>
+
+          <!-- Wrap (paper) -->
+          <path class="wrap" d="M260 420 L340 420 L300 480 Z" />
+        </svg>
+
+        <button id="bloomBtn" class="cta" aria-label="Open your bouquet">Open your bouquet</button>
+        <div class="note" id="note">Made with love • From far away</div>
+      </div>
+
+      <div class="footer">Tip: you can save this page and send the file or host it for free (see steps below).</div>
+    </div>
+  </div>
+
+  <script>
+    // =======================
+    // PERSONALIZE HERE
+    // =======================
+    const recipientName = "Fatima"; // ← put her name
+    const message = "A bouquet for you — even across the distance. I love you ❤️"; // ← your message
+    const closingTag = "– From me"; // small tag text
+
+    // Apply text
+    document.getElementById('recipient').textContent = recipientName;
+    document.getElementById('headline').textContent = message;
+    document.getElementById('note').textContent = `Made with love ${closingTag ? '• ' + closingTag : ''}`;
+
+    // Bloom button logic
+    const bouquet = document.getElementById('bouquet');
+    const bloomBtn = document.getElementById('bloomBtn');
+    let bloomed = false;
+
+    function bloom() {
+      if (bloomed) return;
+      bloomed = true;
+      bouquet.classList.add('bloom');
+      bloomBtn.textContent = 'Rebloom ✨';
+      dropPetals(48);
+    }
+
+    bloomBtn.addEventListener('click', bloom);
+
+    // Drop floating petals confetti
+    function dropPetals(count = 24) {
+      const colors = getComputedStyle(document.documentElement);
+      const c1 = colors.getPropertyValue('--accent') || '#ff6ea6';
+      const c2 = colors.getPropertyValue('--accent-2') || '#ffd166';
+
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        const size = 10 + Math.random() * 16;
+        p.style.width = p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.background = `radial-gradient(circle at 30% 30%, #fff7 12%, #fff0 15%), conic-gradient(from ${Math.random()*360}deg, ${c1}, ${c2})`;
+        p.style.borderRadius = '40% 60% 60% 40% / 50% 40% 60% 50%';
+        p.style.transform = `translateY(-40px) rotate(${Math.random()*360}deg)`;
+        p.style.animation = `fall ${5 + Math.random() * 5}s linear forwards`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 11000);
+      }
+    }
+
+    // Accessibility: press Enter/Space on button
+    bloomBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); bloom();
+      }
+    });
+
+    // Optional: auto focus button for easy tap
+    window.addEventListener('load', () => bloomBtn.focus({preventScroll:true}));
+
+    // Auto-bloom once after a small delay (feels magical)
+    setTimeout(() => { if (!bloomed) bloom(); }, 1200);
+
+    /* =======================
+       HOW TO SHARE
+       1) Right-click → "Save As…" this page as index.html and send the file.
+       2) Or host free:
+          - GitHub Pages: upload index.html to a repo → Settings → Pages.
+          - Netlify/Surge: drag-and-drop the file.
+       ======================= */
+  </script>
+</body>
+</html>
